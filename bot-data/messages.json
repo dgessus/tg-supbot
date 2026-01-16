@@ -1,0 +1,545 @@
+{
+  "user": {
+    "uk": {
+      "faq loaded": {
+        "create_ticket": {
+          "button_text": "\uD83C\uDFABСтворити тікет",
+          "callback_data": "usr_create_ticket",
+          "optional": null
+      },
+      "message_text": "{message_text}",
+      "previous_level": null,
+      "next_level": "ticket created"
+    },
+
+      "ticket created": {
+        "close_ticket": {
+          "button_text": "❌Скасувати заявку",
+          "callback_data": "usr_cancel_ticket_{active_ticket_id}",
+          "optional": null
+      },
+      "message_text": "\uD83C\uDFABТікет #{active_ticket_id} надіслано до айті-відділу. Очікуйте відповіді",
+      "previuos_level": "faq loaded",
+      "next_level": "ticket closed"
+    },
+
+      "ticket canceled": {
+        "close_ticket": {
+          "button_text": "✖\uFE0FЗаявка закрита",
+          "callback_data": "dummycallback",
+          "optional": null
+      },
+      "message_text": "\uD83C\uDFABТікет #{active_ticket_id} скасовано",
+      "previuos_level": "ticket created",
+      "next_level": "ticket needs update"
+    },
+
+      "ticket needs update": {
+        "append_ticket": {
+          "button_text": "\uD83D\uDCDDДодати текст до заявки",
+          "callback_data": "usr_append_ticket_{active_ticket_id}",
+          "optional": null
+      },
+        "update_ticket": {
+          "button_text": "\uD83D\uDD8BЗмінити текст заявки",
+          "callback_data": "usr_update_ticket_{active_ticket_id}",
+          "optional": null
+      },
+        "close_ticket": {
+          "button_text": "Скасувати заявку",
+          "callback_data": "usr_cancel_ticket_{active_ticket_id}",
+          "optional": null
+      },
+
+      "message_text": "\uD83D\uDD34У вас вже є активна заявка #{active_ticket_id}\nБажаєте оновити її чи скасувати?",
+      "previuos_level": "ticket created",
+      "next_level": "ticket is overdue"
+    },
+
+      "ticket is overdue": {
+        "push_ticket": {
+          "button_text": "\uD83D\uDEA8Прискорити виконання заявки",
+          "callback_data": "usr_push_ticket_{active_ticket_id}",
+          "optional": null
+      },
+      "message_text": "⏰Виконання вашої заявки #{active_ticket_id} займає більше часу, ніж зазвичай.\nНатисніть кнопку щоб привернути увагу",
+      "previous_level": "ticket needs update",
+      "next_level": null
+    },
+      "ticket pushed": {
+        "push_ticket": {
+          "button_text": "\uD83D\uDEA8Тікет прискорено",
+          "callback_data": "dummycallback",
+          "optional": null
+      },
+      "message_text": "⏰Processing of your ticket #{active_ticket_id} takes longer than expected.\nClick the button below to draw some attention",
+      "previous_level": "ticket needs update",
+      "next_level": null
+    }
+    },
+
+    "en": {
+      "faq loaded": {
+        "create_ticket": {
+          "button_text": "Submit ticket",
+          "callback_data": "usr_create_ticket",
+          "optional": null
+      },
+      "message_text": "{message_text}",
+      "previous_level": null,
+      "next_level": "ticket created"
+    },
+      "ticket created": {
+        "close_ticket": {
+          "button_text": "❌Cancel ticket",
+          "callback_data": "usr_cancel_ticket_{active_ticket_id}",
+          "optional": null
+      },
+      "message_text": "\uD83C\uDFABYour ticket #{active_ticket_id} has been sent to it dept. You'll be contacted shortly",
+      "previuos_level": "faq loaded",
+      "next_level": "ticket needs update"
+    },
+      "ticket canceled": {
+        "close_ticket": {
+          "button_text": "✖\uFE0FTicket closed",
+          "callback_data": "dummycallback",
+          "optional": null
+      },
+      "message_text": "\uD83C\uDFABTicket #{active_ticket_id} has been canceled",
+      "previuos_level": "ticket created",
+      "next_level": "ticket needs update"
+    },
+      "ticket needs update": {
+        "append_ticket": {
+          "button_text": "\uD83D\uDCDDAppend text to the ticket",
+          "callback_data": "usr_append_ticket_{active_ticket_id}",
+          "optional": null
+      },
+        "update_ticket": {
+          "button_text": "\uD83D\uDD8BChange ticket text",
+          "callback_data": "usr_update_ticket_{active_ticket_id}",
+          "optional": null
+      },
+        "close_ticket": {
+          "button_text": "❌Cancel ticket",
+          "callback_data": "usr_cancel_ticket_{active_ticket_id}",
+          "optional": null
+      },
+      "message_text": "\uD83D\uDD34You already have an active ticket {active_ticket_id}\nDo you wish to edit ticket message or close it altogether?",
+      "previuos_level": "ticket created",
+      "next_level": "ticket is overdue"
+    },
+      "ticket is overdue": {
+        "push_ticket": {
+          "button_text": "\uD83D\uDEA8Push ticket",
+          "callback_data": "usr_push_ticket_{active_ticket_id}",
+          "optional": null
+      },
+      "message_text": "⏰Processing of your ticket #{active_ticket_id} takes longer than expected.\nClick the button below to draw some attention",
+      "previous_level": "ticket needs update",
+      "next_level": null
+    },
+      "ticket pushed": {
+        "push_ticket": {
+          "button_text": "\uD83D\uDEA8Ticket has been pushed",
+          "callback_data": "dummycallback",
+          "optional": null
+      },
+      "message_text": "⏰Processing of your ticket #{active_ticket_id} takes longer than expected.\nClick the button below to draw some attention",
+      "previous_level": "ticket needs update",
+      "next_level": null
+    }
+    }
+  },
+  "admin": {
+    "uk": {
+      "main menu": {
+        "show_tickets": {
+          "button_text": "\uD83D\uDC40Дивитися тікети",
+          "callback_data": "adm_show_tickets",
+          "optional": null
+        },
+        "make_announcement": {
+          "button_text": "\uD83D\uDCE2Зробити оголошення",
+          "callback_data": "announce",
+          "optional": null
+        },
+        "show_closed_tickets": {
+          "button_text": "\uD83D\uDDC2Заявки списком",
+          "callback_data": "closed_tickets_list_menu",
+          "optional": null
+        },
+        "show_stats": {
+          "button_text": "\uD83D\uDCCAСтатистика",
+          "callback_data": "stats",
+          "optional": null
+        },
+        "message_text": "🌚У вас {message_text} відкритих заявок",
+        "previous_level": null,
+        "next_level": "tickets menu"
+      },
+      "announce": {
+        "cancel": {
+          "button_text": "\uD83D\uDD15Скасувати",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "\uD83D\uDCE8Надішліть повідомлення для розсилки (Текст/Фото/Відео/GIF/Усе разом) ОДНИМ ПОВІДОМЛЕННЯМ",
+        "previous_level": "main menu",
+        "next_level": "confirm announcement"
+      },
+      "confirm announcement": {
+        "confirm": {
+          "button_text": "✅Підтвердити відправку",
+          "callback_data": "confirm_announce",
+          "optional": null
+        },
+        "change_text": {
+          "button_text": "\uD83D\uDD8BЗмінити текст оголошення",
+          "callback_data": "announce_edit",
+          "optional": null
+        },
+        "message_text": "‼\uFE0FВи збираєтесь зробити оголошення для {message_text} користувачів. Ви впевнені?",
+        "previous_level": "announce",
+        "next_level": "announce commenced"
+      },
+      "tickets menu": {
+        "previous ticket": {
+          "button_text": "◀\uFE0FПопередній тікет",
+          "callback_data": "ticket_fetch_backward",
+          "optional": null
+        },
+        "close ticket": {
+          "button_text": "✖\uFE0FЗакрити тікет",
+          "callback_data": "adm_close_ticket",
+          "optional": null
+        },
+        "next ticket": {
+          "button_text": "▶️Наступний тікет",
+          "callback_data": "ticket_fetch_forward",
+          "optional": null
+        },
+        "contact": {
+          "button_text": "💬Почати переписку",
+          "callback_data": "message_user",
+          "optional": null
+        },
+        "accept ticket": {
+          "button_text": "🉑Взяти в роботу",
+          "callback_data": "accept_ticket",
+          "optional": null
+        },
+        "main menu": {
+          "button_text": "🗂Головне меню",
+          "callback_data": "back",
+          "optional": null
+        },
+        "view_chat_logs": {
+          "button_text": "\uD83D\uDCD1Історія переписки",
+          "callback_data": "chat_history",
+          "optional": null
+        },
+        "refresh_ticket": {
+          "button_text": "\uD83D\uDD04Оновити",
+          "callback_data": "refresh_ticket_panel",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "one ticket": {
+        "close": {
+          "button_text": "↩\uFE0FЗакрити",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "closed tickets choose range": {
+        "current_day": {
+          "button_text": "\uD83D\uDCC5Сьогодні",
+          "callback_data": "closed_tickets_list_day",
+          "optional": null
+        },
+        "last_week": {
+          "button_text": "\uD83D\uDCC5За тиждень",
+          "callback_data": "closed_tickets_list_week",
+          "optional": null
+        },
+        "last_month": {
+          "button_text": "\uD83D\uDCC5За місяць",
+          "callback_data": "closed_tickets_list_month",
+          "optional": null
+        },
+        "back": {
+          "button_text": "↩\uFE0FНазад",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "⏳Оберіть період часу для вивантаження тікетів",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "bulk ticket load": {
+        "back": {
+          "button_text": "↩\uFE0FНазад",
+          "callback_data": "back",
+          "optional": null
+        },
+        "export_xml": {
+          "button_text": "\uD83D\uDDC4Вивантажити .xlsx",
+          "callback_data": "export",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "closed tickets choose range",
+        "next_level": "one ticket"
+      },
+      "ticket chat history":{
+        "back": {
+          "button_text": "↩\uFE0FНазад",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "tickets menu",
+        "next_level": null
+      },
+      "ticket not loaded": {
+        "back": {
+          "button_text": "↩\uFE0FНазад",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "‼\uFE0F{message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "texting": {
+        "close_session": {
+          "button_text": "\uD83D\uDC4BЗакінчити розмову",
+          "callback_data": "stop_texting",
+          "optional": null
+        },
+        "message_text": "\uD83D\uDCF6З'єднано з користувачем",
+        "previous_level": "tickets_menu",
+        "next_level": null
+      },
+      "show stats": {
+        "back": {
+          "button_text": "↩\uFE0FНазад",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "\uD83E\uDD21Кількість зареєстрованих користувачів: {message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      }
+    },
+    "en": {
+      "main menu": {
+        "show_tickets": {
+          "button_text": "\uD83D\uDC40Show tickets",
+          "callback_data": "adm_show_tickets",
+          "optional": null
+        },
+        "make_announcement": {
+          "button_text": "\uD83D\uDCE2Make an announcement",
+          "callback_data": "announce",
+          "optional": null
+        },
+        "show_closed_tickets": {
+          "button_text": "\uD83D\uDDC2Show closed tickets",
+          "callback_data": "closed_tickets_list_menu",
+          "optional": null
+        },
+        "show_stats": {
+          "button_text": "\uD83D\uDCCAShow stats",
+          "callback_data": "stats",
+          "optional": null
+        },
+        "message_text": "🌚You have {message_text} open tickets",
+        "previous_level": null,
+        "next_level": "tickets menu"
+      },
+      "announce": {
+        "cancel": {
+          "button_text": "\uD83D\uDD15Cancel",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "\uD83D\uDCE8Send in ONE MESSAGE your announcement (Text/Photo/Video/GIF/All at once)",
+        "previous_level": "main menu",
+        "next_level": "confirm announcement"
+      },
+      "confirm announcement": {
+        "confirm": {
+          "button_text": "✅Confirm announcement",
+          "callback_data": "confirm_announce",
+          "optional": null
+        },
+        "change_text": {
+          "button_text": "\uD83D\uDD8BChange announcement message",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "‼\uFE0FYou're about to make an announcement for {message_text} users. Are you sure?",
+        "previous_level": "announce",
+        "next_level": "announce commenced"
+      },
+      "tickets menu": {
+        "previous_ticket": {
+          "button_text": "◀\uFE0FPrevious ticket",
+          "callback_data": "ticket_fetch_backward",
+          "optional": null
+        },
+        "close_ticket": {
+          "button_text": "✖️Close ticket",
+          "callback_data": "adm_close_ticket",
+          "optional": null
+        },
+        "next_ticket": {
+          "button_text": "▶️Next ticket",
+          "callback_data": "ticket_fetch_forward",
+          "optional": null
+        },
+        "contact": {
+          "button_text": "💬Message user",
+          "callback_data": "message_user",
+          "optional": null
+        },
+        "accept_ticket": {
+          "button_text": "\uD83C\uDE51Accept ticket",
+          "callback_data": "accept_ticket",
+          "optional": null
+        },
+        "main_menu": {
+          "button_text": "🗂Main menu",
+          "callback_data": "back",
+          "optional": null
+        },
+        "view_chat_logs": {
+          "button_text": "\uD83D\uDCD1View chat logs",
+          "callback_data": "chat_history",
+          "optional": null
+        },
+        "profile": {
+          "button_text": "User profile",
+          "callback_data": null,
+          "optional": {"url": "tg://user?id={user_id}"}
+        },
+        "refresh_ticket_panel": {
+          "button_text": "\uD83D\uDD04Refresh",
+          "callback_data": "refresh_ticket_panel",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "one ticket": {
+        "close": {
+          "button_text": "↩\uFE0FClose",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "closed tickets choose range": {
+        "current_day": {
+          "button_text": "\uD83D\uDCC5 Today’s summary",
+          "callback_data": "closed_tickets_list_day",
+          "optional": null
+        },
+        "last_week": {
+          "button_text": "\uD83D\uDCC5 Week's summary",
+          "callback_data": "closed_tickets_list_week",
+          "optional": null
+        },
+        "last_month": {
+          "button_text": "\uD83D\uDCC5 Month's summary",
+          "callback_data": "closed_tickets_list_month",
+          "optional": null
+        },
+        "back": {
+          "button_text": "↩\uFE0FBack",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "⏳Choose the time range for closed tickets",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "bulk ticket load": {
+        "back": {
+          "button_text": "↩\uFE0FBack",
+          "callback_data": "back",
+          "optional": null
+        },
+        "export_xml": {
+          "button_text": "\uD83D\uDDC4Export xml",
+          "callback_data": "export",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "closed tickets choose range",
+        "next_level": "one ticket"
+      },
+      "ticket chat history":{
+        "back": {
+          "button_text": "↩\uFE0FBack",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "tickets menu",
+        "next_level": null
+      },
+      "ticket not loaded": {
+        "back": {
+          "button_text": "↩\uFE0FBack",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "‼\uFE0F{message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "texting": {
+        "close_session": {
+          "button_text": "\uD83D\uDC4BFinish the conversation",
+          "callback_data": "stop_texting",
+          "optional": null
+        },
+        "message_text": "\uD83D\uDCF6Conversation with shop",
+        "previous_level": "tickets_menu",
+        "next_level": null
+      },
+      "any": {
+        "back": {
+          "button_text": "↩\uFE0FBack",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "{message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      },
+      "show stats": {
+        "back": {
+          "button_text": "↩\uFE0FBack",
+          "callback_data": "back",
+          "optional": null
+        },
+        "message_text": "\uD83E\uDD21Registered users count: {message_text}",
+        "previous_level": "main menu",
+        "next_level": null
+      }
+    }
+  }
+}
