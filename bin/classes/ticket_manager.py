@@ -64,7 +64,7 @@ class TicketManager:
         db = _Database()
         self.database = db
 
-    async def create_ticket(self, ticket: Ticket) -> int:
+    async def create_ticket(self, ticket: Ticket) -> Ticket.ticket_id:
         logger.info(f"creating a new ticket")
         ticket_dict = ticket.to_dict()
         try:
@@ -85,7 +85,7 @@ class TicketManager:
         else:
             raise Exception("ticket not found")
 
-    async def close_ticket(self, ticket_id, closedby_user_id: int) -> bool:
+    async def close_ticket(self, ticket_id, closedby_user_id: int) -> None:
         logger.info(f"closind ticket #{ticket_id}, closed by tg://user?id={closedby_user_id}")
         ticket_obj = await self.find_user_ticket(ticket_id)
 
@@ -104,7 +104,7 @@ class TicketManager:
             await self.database.update(table="tickets", match_columns_values={"ticket_id": ticket_id}, columns_values= {"status": 0, "closed_by": closedby_user_id, "closed_at": datetime.now().isoformat()})
             logger.info(f"ticket #{ticket_id} closed.")
 
-        return True
+        return None
 
     async def update_ticket(self, ticket_id: int, update_columns_values: dict) -> None:
         ticket_to_update = await self.find_user_ticket(ticket_id)
@@ -118,7 +118,7 @@ class TicketManager:
             ticket = ticket_to_update.to_dict()
             await self.database.update(table="tickets", match_columns_values={'ticket_id': ticket_id}, columns_values=ticket)
 
-    async def query_open(self) -> list:
+    async def query_open(self) -> list[Ticket.ticket_id]:
         logger.info(f"querying open tickets.")
 
         rows = await self.database.select(table="tickets", columns_values={"status": (1, 2, 3)})
@@ -130,8 +130,9 @@ class TicketManager:
 
         return ticket_ids
 
-    async def query_closed(self, period: str) -> list:
+    async def query_closed(self, period: str) -> list[Ticket.ticket_id]:
         logger.info(f"querying closed tickets.")
+        logger.info(f"period: {period}")
         ticket_ids = []
 
         now = datetime.now()
@@ -143,6 +144,7 @@ class TicketManager:
         elif period == "month":
             start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         else:
+            logger.warning(f"Unsupported period: {period}")
             raise ValueError(f"Unsupported period: {period}")
 
         date_range = (start.isoformat(), now.isoformat())

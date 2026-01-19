@@ -445,6 +445,8 @@ async def manual_ticket_selection_handler(update: Update, context: ContextTypes.
 
 
 async def closed_tickets_list(update: Update, context: CallbackContext):
+    logger.info(f'[{update.effective_chat.id}] user called closed tickets list')
+
     position = update.callback_query.data.split("_")[-1]
     if position == "menu":
         context.user_data["menu_position"] = "closed tickets choose range"
@@ -456,6 +458,7 @@ async def closed_tickets_list(update: Update, context: CallbackContext):
         closed_tickets = await ticket_manager.query_closed(position)
         ticket_list = [f"{ticket}" for ticket in closed_tickets]
         message = '\n'.join([f"/{ticket}" for ticket in ticket_list])
+        logger.info(f'[{update.effective_chat.id}] closed tickets list: {message}')
         context.user_data["ticket_list"] = ticket_list
 
         if message:
