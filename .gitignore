@@ -14,3 +14,4 @@ bot-data/config.json
 bot-data/main.db
 bot-data/main.db-shm
 bot-data/main.db-wal
+bot-data/bot-data.pkl
