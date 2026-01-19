@@ -1,6 +1,6 @@
-## sota it support bot
+-- Sota IT Support bot
 
-## How to install:
+-- How to install:
 1. Paste all contents of .zip file somewhere safe.
 2. Configure the config.json as shown in config-template.json : without the config.json file bot will not work.
 3. Create .venv (python -m venv .venv)
