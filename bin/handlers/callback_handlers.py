@@ -18,6 +18,15 @@ config = Load_config()
 ticket_manager = TicketManager()
 
 
+def get_username(update: Update, context: CallbackContext):
+    username = (context.user_data['shop_name'] or
+                update.effective_user.username or
+                update.effective_user.first_name or
+                update.effective_user.last_name or
+                f"Відсутнє ім'я користувача: ID={update.effective_chat.id}")
+    return username
+
+
 async def dummy(update: Update, context: CallbackContext):
     await update.callback_query.answer()
 
@@ -56,8 +65,9 @@ def get_user_media(update:Update, context: CallbackContext):
 async def usr_create_ticket(update: Update, context: CallbackContext):
     messages_list = get_user_messages(update, context)
     message_text = "\n".join(messages_list)
+    username = get_username(update, context)
 
-    ticket = Ticket(user_id=update.effective_chat.id, username=update.effective_user.username,
+    ticket = Ticket(user_id=update.effective_chat.id, username=username,
                     shop_name=context.user_data["shop_name"], message_text=message_text)
     new_ticket_id = await ticket_manager.create_ticket(ticket)
     ticket_media = get_user_media(update, context)
@@ -307,11 +317,7 @@ async def back(update: Update, context: CallbackContext):
 async def accept(update: Update, context: CallbackContext):
     ticket_list = context.user_data["ticket_list"]
     current_ticket = None
-    username = (context.user_data['shop_name'] or
-                update.effective_user.username or
-                update.effective_user.first_name or
-                update.effective_user.last_name or
-                f"Відсутнє ім'я користувача: ID={update.effective_chat.id}")
+    username = get_username(update, context)
 
     for i, ticket_id in enumerate(ticket_list):
         if isinstance(ticket_id, str) and ticket_id.startswith("^"):
@@ -345,12 +351,7 @@ async def accept(update: Update, context: CallbackContext):
 async def message_user(update: Update, context: CallbackContext):
     subject_ticket_id = context.user_data["active_ticket_id"][-1]
     ticket = await ticket_manager.find_user_ticket(ticket_id=subject_ticket_id)
-    username = (context.user_data['shop_name'] or
-                update.effective_user.username or
-                update.effective_user.first_name or
-                update.effective_user.last_name or
-                f"Відсутнє ім'я користувача: ID={update.effective_chat.id}")
-
+    username = get_username(update, context)
 
     if ticket.status == 1 or 3:
         await ticket_manager.update_ticket(ticket_id=subject_ticket_id,
