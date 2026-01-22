@@ -19,7 +19,7 @@
           "optional": null
       },
       "message_text": "\uD83C\uDFABТікет #{active_ticket_id} надіслано до айті-відділу. Очікуйте відповіді",
-      "previuos_level": "faq loaded",
+      "previous_level": "faq loaded",
       "next_level": "ticket closed"
     },
 
@@ -30,7 +30,7 @@
           "optional": null
       },
       "message_text": "\uD83C\uDFABТікет #{active_ticket_id} скасовано",
-      "previuos_level": "ticket created",
+      "previous_level": "ticket created",
       "next_level": "ticket needs update"
     },
 

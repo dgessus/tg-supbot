@@ -2,7 +2,7 @@ import dataclasses
 from typing import Optional
 from datetime import datetime, timedelta
 from bin.classes.aiodatabase import _Database
-from bin.handlers.logger import logger
+from utils.logger import logger
 
 
 @dataclasses.dataclass
@@ -86,7 +86,7 @@ class TicketManager:
             raise Exception("ticket not found")
 
     async def close_ticket(self, ticket_id, closedby_user_id: int) -> None:
-        logger.info(f"closind ticket #{ticket_id}, closed by tg://user?id={closedby_user_id}")
+        logger.info(f"closing ticket #{ticket_id}, closed by tg://user?id={closedby_user_id}")
         ticket_obj = await self.find_user_ticket(ticket_id)
 
         if ticket_obj is None:

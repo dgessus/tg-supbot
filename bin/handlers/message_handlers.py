@@ -1,20 +1,13 @@
-from telegram import (Update,
-                      ReplyKeyboardMarkup,
-                      KeyboardButton,
-                      ReplyKeyboardMarkup,
-                      ReplyKeyboardRemove,
-                      Update)
-from telegram.ext import ContextTypes
+from telegram import (KeyboardButton,
+                      ReplyKeyboardMarkup)
 from functools import wraps
 import datetime
 
 from bin.classes.auth import Auth
 from bin.classes.pattern_search import Instruction
-from bin.classes.message_constructor import MessageConstructor
-from bin.classes.ticket_manager import TicketManager
 from bin.handlers.message_forwarding_handler import forward_message
 from bin.handlers.async_jobs import *
-from bin.handlers.logger import logger
+from utils.logger import logger
 
 ticket_mgr = TicketManager()
 
@@ -23,7 +16,7 @@ def requires_verification(handler_func):
     @wraps(handler_func)
     async def wrapper(update, context, *args, **kwargs):
         if not context.user_data.get("verified") and not context.user_data.get("chat_partner"):
-            logger.info(f'[{update.effective_chat.id}] authorising user')
+            logger.info(f'authorising user', extra={"user_id" : update.effective_chat.id})
             context.user_data['menu_position'] = 'verification'
             await start_handler(update, context)
             return None
@@ -79,19 +72,21 @@ async def questions_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
     message_text = None
 
-    logger.info(f'[{update.effective_chat.id}] questions handler has been triggered by user; message contents: <{update.message.text}>')
+    logger.info(f'questions handler has been triggered by user; message contents: <{update.message.text}>',
+                update.effective_chat.id)
     if update.message.text or update.message.caption:
         message_text = Instruction().load(user_input=update.message.text or update.message.caption,
                                           lang=context.user_data['lang'])
-    logger.info(f'[{update.effective_chat.id}] loaded instruction for user')
+    logger.info(f'loaded instruction for user', extra={"user_id" : update.effective_chat.id})
     context.user_data['menu_position'] = 'faq loaded'
 
     if message_text:
-        await MessageConstructor(update=update, context=context, message_text=message_text, sanitize=True, parse_mode="MarkdownV2").send.refresh_message()
+        await MessageConstructor(update=update, context=context, message_text=message_text,
+                                 sanitize=True, parse_mode="MarkdownV2").send.refresh_message()
 
 
 async def edit_ticket_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    logger.info(f"[{update.effective_chat.id}] edit ticket text has been triggered by user; message contents: <{update.message.text}>")
+    logger.info(f"edit ticket text has been triggered by user; message contents: <{update.message.text}>", extra={"user_id" : update.effective_chat.id})
     message_text = "🚯У вас вже є активна заявка. Бажаєте оновити її чи скасувати?"
 
     context.user_data['menu_position'] = 'ticket needs update'
@@ -113,7 +108,7 @@ def format_message_for_storage(update: Update, context: ContextTypes.DEFAULT_TYP
             f"at {datetime.datetime.now().isoformat()}\n")
 
 async def texting_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    logger.info(f'[{update.effective_chat.id}] texting handler has been called by user; context.user_data contents: <{context.user_data}>')
+    logger.info(f'context.user_data contents: <{context.user_data}>', extra={"user_id" : update.effective_chat.id})
     forward_to = context.user_data.get('chat_partner', None)
     message_obj = None
     topic_ticket_id = context.user_data['active_ticket_id'][-1]
@@ -121,7 +116,7 @@ async def texting_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     if forward_to:
         try:
-            logger.info(f'[{update.effective_chat.id}] message_forward_handler has been called by user; recipient_id: <{forward_to}>')
+            logger.info(f'called by user; recipient_id: <{forward_to}>', extra={"user_id" : update.effective_chat.id})
             message_obj = await forward_message(update, context)
         except ValueError:
             try:
@@ -141,7 +136,7 @@ async def texting_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 async def announce_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    logger.info(f'[{update.effective_chat.id}] announce handler has been called by user')
+    logger.info('called by user', extra={"user_id" : update.effective_chat.id})
     context.user_data['menu_position'] = "confirm announcement"
     users = len(context.bot_data.get('users', []))
     await MessageConstructor(update=update, context=context, message_text=users).send.refresh_message()

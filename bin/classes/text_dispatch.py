@@ -1,5 +1,5 @@
 from bin.handlers.message_handlers import *
-from bin.handlers.logger import logger
+from utils.logger import logger
 
 @requires_verification
 async def states_router(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -17,13 +17,13 @@ async def states_router(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     context.user_data.setdefault('user_messages', []).append(update.message)
 
     state = context.user_data.get('menu_position')
-    logger.info(f'[{update.effective_chat.id}] current user state: <{state}>')
-    logger.info(f'[{update.effective_chat.id}] user messages: <{context.user_data["user_messages"]}>')
+    logger.info(f'current user state: <{state}>', update.effective_chat.id)
+    logger.info(f'user messages: <{context.user_data["user_messages"]}>', update.effective_chat.id)
     try:
         await USER_STATES_ROUTER[state](update, context)
     except KeyError:
         if context.user_data['role'] == 'user':
-            logger.warning(f'[{update.effective_chat.id}] user has an unsupported state: <{state}>')
+            logger.error(f'user has an unsupported state: <{state}>', update.effective_chat.id)
             context.user_data['menu_position'] = "user verification complete"
             await update.message.reply_text(text='😬Ой, у нас щось зламалося!\nПовертаю усе як було...')
             await update.message.reply_text(text='✔️Верифікацію пройдено\n❓Опишіть вашу проблему (Не друкує принтер, треба змінити пароль в 1С, і т.д)')

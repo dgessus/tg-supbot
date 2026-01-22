@@ -5,14 +5,14 @@ from telegram.ext import ContextTypes
 
 from bin.classes.message_constructor import MessageConstructor
 from bin.classes.ticket_manager import Ticket, TicketManager
-from bin.handlers.logger import logger
+from utils.logger import logger
 from utils.config_loader import Load_config
 import asyncio
 
 config = Load_config()
 
 async def notify_admin(update: Update, context: ContextTypes.DEFAULT_TYPE, notification_type: Literal['new_ticket', 'ticket_overdue'], ticket_id: int = None) -> None:
-    logger.info(f'notifying admins about ticket')
+    logger.info(f'notifying admins about ticket', update.effective_chat.id)
     def format_notification_text(ticket: Ticket, notification_type):
         if notification_type == 'new_ticket':
             message_text = (f"🎫Новий тікет від ТТ {ticket.shop_name}\n"

@@ -1,22 +1,23 @@
-from telegram.ext import ContextTypes, CallbackContext
-from telegram import InputMediaPhoto, InputMediaVideo, InputMediaAnimation
+from telegram.ext import CallbackContext
+from telegram import InputMediaPhoto, InputMediaVideo, InputMediaAnimation, Update
 import json
 
-from bin.handlers.logger import logger
+from utils.logger import logger
 
 class Media:
-    def __init__(self, context: CallbackContext):
+    def __init__(self, update: Update, context: CallbackContext):
         self.context = context
+        self.update = update
 
     def get_user_media(self):
         logger.info(
-            f"get_user_media received contents of context.user_data['user_messages']: <{self.context.user_data['user_messages']}>")
+            f"received contents of context.user_data['user_messages']", extra={"user_id" : self.update.effective_chat.id})
 
         user_media = []
         for message in self.context.user_data["user_messages"]:
 
             if message.photo:
-                logger.info(f'handler get_user_media found photo in context_user_data')
+                logger.info(f'found a photo in context_user_data', extra={"user_id" : self.update.effective_chat.id})
                 user_media.append(InputMediaPhoto(media=message.photo[-1].file_id))
             if message.video:
                 user_media.append(InputMediaVideo(media=message.video.file_id))
@@ -28,6 +29,7 @@ class Media:
     def serialize(self) -> str:
         data = self.get_user_media()
         serialized = []
+        logger.info(f"serializing user media for storage", extra={"user_id" : self.update.effective_chat.id})
 
         for file in data:
             if isinstance(file, InputMediaPhoto):

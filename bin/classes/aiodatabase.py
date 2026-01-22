@@ -1,10 +1,9 @@
 import aiosqlite
 
 from utils.paths import Paths
-from bin.handlers.logger import logger
+from utils.logger import logger
 
 import asyncio
-from typing import Dict, Tuple, Any
 
 path = Paths()
 

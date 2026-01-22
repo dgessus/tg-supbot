@@ -1,13 +1,11 @@
 import json
-from argparse import ArgumentError
-from functools import lru_cache
 
 from telegram.ext import ContextTypes
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto, InputMediaVideo, \
     InputMediaAnimation
 import re
 
-from bin.handlers.logger import logger
+from utils.logger import logger
 from utils.paths import Paths
 from utils.config_loader import Load_config
 
@@ -16,7 +14,11 @@ paths = Paths()
 supported_languages = config.supported_languages
 
 class MessageConstructor:
-    def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE, message_text = "вибачте, повідомлення не підвантажилось", media: list[dict] = None, sanitize: bool = False, remove_user_messages: bool = False, *args, **kwargs) -> None:
+    def __init__(self, update: Update, context: ContextTypes.DEFAULT_TYPE,
+                 message_text = "вибачте, повідомлення не підвантажилось",
+                 media: list[dict] = None, sanitize: bool = False,
+                 remove_user_messages: bool = False, *args, **kwargs) -> None:
+
         self.update = update
         self.context = context
         self.message_text = message_text
@@ -34,7 +36,6 @@ class MessageConstructor:
         self.__dict__.update(kwargs)
         self._load_data = self._Load_data(self)
         self._send = self._Send(self)
-        logger.info(f"[{self.user_id}] Main MessageConstructor class has been called")
 
     @property
     def load_data(self) -> "_Load_data":
@@ -62,7 +63,7 @@ class MessageConstructor:
             self.user_id = self.parent.user_id
             self.kwargs = self.parent.kwargs
             self.__dict__.update(self.kwargs)
-            logger.info(f'[{self.user_id}] active ticket id in _Load_data: <{self.active_ticket_id}>')
+            logger.info(f'active ticket id: <{self.active_ticket_id}>', extra={"user_id" : self.update.effective_chat.id})
 
         @staticmethod
       #  @lru_cache вызывает проблемы с повторным закрытием тикета юзером
@@ -81,9 +82,9 @@ class MessageConstructor:
                 if json_key == "message_text":
                     self.parent.message_text = json_value.format(**var_map)
                 elif isinstance(json_value, dict):
-                    logger.info(f'[{self.user_id}] json value: <{json_value}>')
+                    logger.info(f'json value: <{json_value}>', extra={"user_id" : self.update.effective_chat.id})
                     for key, value in json_value.items():
-                        if key in ("callback_data", "optional") and key is not None:
+                        if key in ("callback_data", "optional") and value is not None:
                             try:
                                 if isinstance(json_value[key], dict):
                                     nested = json_value[key]
@@ -93,7 +94,7 @@ class MessageConstructor:
                                 json_value[key] = value.format(**var_map)
 
                             except Exception as e:
-                                logger.warning(f"[{self.user_id}] failed to evaluate json string while processing key <{key}>: <{e}>. Proceeding...")
+                                logger.warning(f"failed to evaluate json string while processing key <{key}>: <{e}>. Proceeding...", extra={"user_id" : self.update.effective_chat.id})
                                 json_value[key] = value
 
                     buttons[json_key] = json_value
@@ -106,11 +107,11 @@ class MessageConstructor:
             positions = {}
             for json_key, json_value in context_data.items():
                 if json_key == "previous_level":
-                    logger.info(f'[{self.user_id}] positional value "prev" from json: <{json_value}>')
+                    logger.info(f'positional value "prev" from json: <{json_value}>', extra={"user_id" : self.update.effective_chat.id})
                     positions['previous_level'] = json_value
 
                 elif json_key == "next_level":
-                    logger.info(f'[{self.user_id}] positional value "next" from json: <{json_value}>')
+                    logger.info(f'positional value "next" from json: <{json_value}>', extra={"user_id" : self.update.effective_chat.id})
                     positions['next_level'] = json_value
 
             return positions
@@ -125,8 +126,8 @@ class MessageConstructor:
             buttons.append(InlineKeyboardButton(button_text, callback_data=callback_data if callback_data else None, **json_kwargs))
 
         keyboard = MessageConstructor._chunk_buttons(buttons, 3)
-        logger.info(f"[{self.user_id}] buttons <{buttons}>")
-        logger.info(f"[{self.user_id}] keyboard: <{keyboard}>")
+        logger.info(f"buttons <{buttons}>", extra={"user_id" : self.update.effective_chat.id})
+        logger.info(f"keyboard: <{keyboard}>", extra={"user_id" : self.update.effective_chat.id})
         markup = InlineKeyboardMarkup(keyboard)
         return markup
 
@@ -148,7 +149,6 @@ class MessageConstructor:
             self.kwargs = self.parent.kwargs
             self.user_id = self.parent.user_id
             self.__dict__.update(self.kwargs)
-            logger.info(f"[{self.user_id}] _Send subclass has been called")
 
         async def _send(self, markup):
             sanitized_message_text = self.parent.sanitize_md(self.message_text) if self.sanitize else self.message_text
@@ -163,31 +163,34 @@ class MessageConstructor:
                     for message in chunked_message:
                         msg = await self.context.bot.send_message(chat_id=self.user_id, text=message, reply_markup=markup, **self.kwargs)
                         self.context.user_data['bot_message_ids'].append(msg.message_id)
-                        logger.info(f"[{self.user_id}] sent a message to the user")
+                        logger.info(f"sent a message to the user", extra={"user_id" : self.update.effective_chat.id})
 
                 except Exception as e:
+                    logger.error(f"failed to send a message to the user", extra={"user_id" : self.update.effective_chat.id})
                     raise Exception('Failed to send message: {}'.format(e))
 
             else:
                 if len(self.media) == 1:
                     if isinstance(self.media[0], InputMediaPhoto):
-                        logger.info(f"[{self.user_id}] found a single photo in media data: <{self.media[0]}>")
-                        msg = await self.context.bot.send_photo(chat_id=self.user_id, photo=self.media[0].media, caption=self.media[0].caption, reply_markup=markup, **self.kwargs)
+                        logger.info(f"found a single photo in media data: <{self.media[0]}>", extra={"user_id" : self.update.effective_chat.id})
+                        msg = await self.context.bot.send_photo(chat_id=self.user_id, photo=self.media[0].media, caption=self.media[0].caption,
+                                                                reply_markup=markup, **self.kwargs)
                         self.context.user_data['bot_message_ids'].append(msg.message_id)
 
                     if isinstance(self.media[0], InputMediaVideo):
-                        logger.info(f"[{self.user_id}] found a single video in media data: <{self.media[0]}>")
-                        msg = await self.context.bot.send_video(chat_id=self.user_id, video=self.media[0].media, caption=self.media[0].caption, reply_markup=markup, **self.kwargs)
+                        logger.info(f"found a single video in media data: <{self.media[0]}>", extra={"user_id" : self.update.effective_chat.id})
+                        msg = await self.context.bot.send_video(chat_id=self.user_id, video=self.media[0].media, caption=self.media[0].caption,
+                                                                reply_markup=markup, **self.kwargs)
                         self.context.user_data['bot_message_ids'].append(msg.message_id)
 
                     if isinstance(self.media[0], InputMediaAnimation):
-                        logger.info(f"[{self.user_id}] found a single GIF in media data: <{self.media[0]}>")
-                        msg = await self.context.bot.send_animation(chat_id=self.user_id, animation=self.media[0].media, caption=self.media[0].caption, reply_markup=markup, **self.kwargs)
+                        logger.info(f"found a single GIF in media data: <{self.media[0]}>", extra={"user_id" : self.update.effective_chat.id})
+                        msg = await self.context.bot.send_animation(chat_id=self.user_id, animation=self.media[0].media, caption=self.media[0].caption,
+                                                                    reply_markup=markup, **self.kwargs)
                         self.context.user_data['bot_message_ids'].append(msg.message_id)
 
                 elif len(self.media) > 1:
-                    logger.info(
-                    f"[{self.user_id}] found an album in media data: <{self.media[0]}>")
+                    logger.info(f"found an album in media data: <{self.media[0]}>", extra={"user_id" : self.update.effective_chat.id})
                     msg_list = await self.context.bot.send_media_group(chat_id=self.user_id, media=self.media, **self.kwargs)
                     bonus_message = await self.context.bot.send_message(chat_id=self.user_id, text="\u2063", reply_markup=markup, **self.kwargs)
 
@@ -195,8 +198,8 @@ class MessageConstructor:
                     for message in msg_list:
                         self.context.user_data['bot_message_ids'].append(message.message_id)
                 else:
-                    logger.info(f"[{self.user_id}] No media found in the media list")
-                    raise Exception("No media found in the media list")
+                    logger.info(f"No media found in the media list", extra={"user_id" : self.update.effective_chat.id})
+                    raise Exception("No media found in the media list", self.update.effective_chat.id)
 
         async def _edit(self, markup):
             if self.remove_user_messages:
@@ -210,16 +213,22 @@ class MessageConstructor:
             if message_id is not None:
                 try:
                     safe_message_text = self.parent.sanitize_md(self.message_text) if self.sanitize else self.message_text
-                    await self.context.bot.edit_message_text(text=safe_message_text, chat_id=self.user_id, message_id=message_id, reply_markup=markup)
-                    logger.info(f"[{self.user_id}] edited message for user")
+                    await self.context.bot.edit_message_text(text=safe_message_text, chat_id=self.user_id, message_id=message_id,
+                                                             reply_markup=markup)
+
+                    logger.info(f"edited message for user", extra={"user_id" : self.update.effective_chat.id})
+
                 except Exception as e:
-                    logger.warning(f"[{self.user_id}] failed to edit message for user; taget message id: <{message_id}>, API error: <{e}>")
+                    logger.warning(f"failed to edit message for user; taget message id: <{message_id}>, API error: <{e}>",
+                                   extra={"user_id" : self.update.effective_chat.id})
                     raise
+
             elif self.media:
-                logger.error(f"[{self.user_id}] cannot add media to an existing message")
+                logger.error("cannot add media to an existing message", extra={"user_id" : self.update.effective_chat.id})
                 raise TypeError("Cannot add media to an existing message")
+
             else:
-                logger.warning(f"[{self.user_id}] message to edit is None")
+                logger.warning(f"message to edit is None", extra={"user_id" : self.update.effective_chat.id})
                 raise ValueError("Message to edit is None")
 
         @staticmethod
@@ -247,37 +256,38 @@ class MessageConstructor:
                     try:
                         await self.context.bot.delete_message(self.user_id, message_id)
                     except Exception as e:
-                        logger.warning(f"[{self.user_id}] failed to delete message for user; taget message id: <{message_id}>, error: <{e}>")
+                        logger.warning(f"failed to delete message for user; taget message id: <{message_id}>, error: <{e}>",
+                                       extra={"user_id" : self.update.effective_chat.id})
+
                 self.context.user_data['bot_message_ids'].clear()
 
         async def clear_user_messages(self):
             user_messages = self.context.user_data["user_messages"]
-            logger.info(f"[{self.user_id}] clearing messages for user")
-
+            logger.info(f"clearing user messages", extra={"user_id" : self.update.effective_chat.id})
 
             for message in user_messages:
                 try:
                     await self.context.bot.delete_message(message.chat.id, message.message_id)
                 except Exception as e:
-                    logger.warning(f"[{self.user_id}] failed to delete user message: <{message}>; API error: <{e}>")
+                    logger.warning(f"failed to delete user message: <{message}>; API error: <{e}>", extra={"user_id" : self.update.effective_chat.id})
 
             self.context.user_data["user_messages"].clear()
 
         async def new_message(self):
-            logger.info(f'[{self.user_id}] method new_message has been called')
+            logger.info(f'method has been called', extra={"user_id" : self.update.effective_chat.id})
             keyboard = self.keyboard
             try:
                 await self._send(keyboard)
             except Exception as e:
-                logger.warning(f'[{self.user_id}] failed to send new message to to user; API error: <{e}>')
+                logger.error(f'failed to send new message to to user; API error: <{e}>', extra={"user_id" : self.update.effective_chat.id})
 
         async def edit_message(self):
-            logger.info(f'[{self.user_id}] method edit_message has been called')
+            logger.info(f'method has been called', extra={"user_id" : self.update.effective_chat.id})
             keyboard = self.keyboard
             try:
                 await self._edit(keyboard)
             except Exception as e:
-                logger.warning(f'[{self.user_id}] failed to edit bot message; API error: <{e}>')
+                logger.warning(f'failed to edit bot message; API error: <{e}>', extra={"user_id" : self.update.effective_chat.id})
                 await self.clear_bot_messages()
                 await self._send(keyboard)
 

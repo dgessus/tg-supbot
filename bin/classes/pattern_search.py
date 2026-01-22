@@ -1,7 +1,7 @@
 import json
 import re
 
-from bin.handlers.logger import logger
+from utils.logger import logger
 import utils.paths as paths
 from functools import lru_cache
 
@@ -34,6 +34,7 @@ class Instruction:
                 return func_name
 
         return "handle_undefined"
+
     @classmethod
     def load(cls, user_input : str, lang: str = 'uk'):
         file_name = cls._search_patterns(user_input)
