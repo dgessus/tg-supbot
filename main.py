@@ -11,6 +11,7 @@ from utils.config_loader import Load_config
 from bin.handlers.message_handlers import *
 from bin.classes.text_dispatch import states_router
 from bin.handlers.callback_handlers import *
+from bin.handlers.error_handlers import *
 
 
 path = Paths()
@@ -53,8 +54,10 @@ class TelegramBot:
         self.application.add_handler(CallbackQueryHandler(callback=export_ticket_data, pattern=r"^export$"))
         self.application.add_handler(CallbackQueryHandler(callback=show_stats, pattern=r"^stats$"))
 
-
+        #dummy callback for buttons that do nothing. Prevents the infinite loading
         self.application.add_handler(CallbackQueryHandler(callback=dummy, pattern=r"^dummycallback$"))
+
+        self.application.add_error_handler(role_error)
 
     def run(self):
         self.application.run_polling()

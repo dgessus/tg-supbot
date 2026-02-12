@@ -73,7 +73,7 @@ async def questions_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     message_text = None
 
     logger.info(f'questions handler has been triggered by user; message contents: <{update.message.text}>',
-                update.effective_chat.id)
+                extra={"user_id" : update.effective_chat.id})
     if update.message.text or update.message.caption:
         message_text = Instruction().load(user_input=update.message.text or update.message.caption,
                                           lang=context.user_data['lang'])
@@ -96,6 +96,7 @@ async def edit_ticket_text_handler(update: Update, context: ContextTypes.DEFAULT
 
 async def admin_panel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     context.user_data['menu_position'] = 'main menu'
+    context.user_data['ticket_watcher'] = asyncio.create_task(check_for_new_tickets(update, context))
     open_tickets = len(await ticket_mgr.query_open())
     await MessageConstructor(update=update, context=context, message_text=open_tickets, remove_user_messages=True).send.refresh_message()
 
@@ -118,6 +119,11 @@ async def texting_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         try:
             logger.info(f'called by user; recipient_id: <{forward_to}>', extra={"user_id" : update.effective_chat.id})
             message_obj = await forward_message(update, context)
+
+            context.user_data['bot_message_ids'].append(message_obj.message_id) if message_obj else None
+            message = format_message_for_storage(update, context)
+            context.bot_data[topic_ticket_id].append(message)
+
         except ValueError:
             try:
                 message_obj = await context.bot.send_message(chat_id=forward_to,
@@ -129,10 +135,6 @@ async def texting_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     else:
         await update.effective_chat.send_message("🚷Користувача не знайдено\nКористувач видалив чат або щось пішло не так")
         raise ValueError("No recipient id specified")
-
-    context.user_data['bot_message_ids'].append(message_obj.message_id)
-    message = format_message_for_storage(update, context)
-    context.bot_data[topic_ticket_id].append(message)
 
 
 async def announce_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

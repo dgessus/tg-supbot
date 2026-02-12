@@ -67,13 +67,17 @@ async def usr_create_ticket(update: Update, context: CallbackContext):
     message_text = "\n".join(messages_list)
     username = get_username(update, context)
 
-    ticket = Ticket(user_id=update.effective_chat.id, username=username,
-                    shop_name=context.user_data["shop_name"], message_text=message_text)
-    new_ticket_id = await ticket_manager.create_ticket(ticket)
-    ticket_media = get_user_media(update, context)
+    if messages_list:
+        ticket = Ticket(user_id=update.effective_chat.id, username=username,
+                        shop_name=context.user_data["shop_name"], message_text=message_text)
+        new_ticket_id = await ticket_manager.create_ticket(ticket)
+        ticket_media = get_user_media(update, context)
 
-    context.user_data["active_ticket_id"].append(int(new_ticket_id))
-    context.user_data["menu_position"] = "ticket created"
+        context.user_data["active_ticket_id"].append(int(new_ticket_id))
+        context.user_data["menu_position"] = "ticket created"
+    else:
+        await update.callback_query.answer('❗️Срок дії тікета сплив. Повторіть ваше питання')
+        return None
 
     logger.info(f"amount of elements in ticket_media: {len(ticket_media)}", extra={"user_id" : update.effective_chat.id})
 
@@ -98,6 +102,7 @@ async def usr_create_ticket(update: Update, context: CallbackContext):
     await notify_admin(update, context, notification_type="new_ticket")
     await update.callback_query.answer()
     await MessageConstructor(update=update, context=context, remove_user_messages=True).send.refresh_message()
+    return None
 
 
 async def usr_cancel_ticket(update: Update, context: CallbackContext):
