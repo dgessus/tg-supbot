@@ -11,7 +11,6 @@ from utils.config_loader import Load_config
 from bin.handlers.message_handlers import *
 from bin.classes.text_dispatch import states_router
 from bin.handlers.callback_handlers import *
-from bin.handlers.error_handlers import *
 
 
 path = Paths()
