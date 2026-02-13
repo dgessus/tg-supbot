@@ -1,7 +1,7 @@
 import dataclasses
 from typing import Optional
 from datetime import datetime, timedelta
-from bin.classes.aiodatabase import _Database
+from bin.classes.aiodatabase import db
 from utils.logger import logger
 
 
@@ -61,7 +61,6 @@ class Ticket:
 
 class TicketManager:
     def __init__(self):
-        db = _Database()
         self.database = db
 
     async def create_ticket(self, ticket: Ticket) -> Ticket.ticket_id:

@@ -62,6 +62,23 @@ def get_user_media(update:Update, context: CallbackContext):
     return user_media
 
 
+async def format_ticket_text(ticket: Ticket):
+    status = {0: "✅Закрито",
+              1: "🟡Очікує виконання",
+              2: "🟢Виконується",
+              3: "🔴Протерміновано❗️",
+              4: "❎Скасовано користувачем"}
+
+    message = (f"🎫Тікет #{ticket.ticket_id} від користувача 🗣{ticket.shop_name}\n\n"
+               f"💬{ticket.message_text}\n\n"
+               f"🗓Дата створення заявки: {ticket.created_at}\n\n"
+               f"🏚Для відділу: {ticket.designated_dept}\n\n"
+               f"🫠Виконавець: {ticket.assigned_to}\n\n"
+               f"📊Статус: {status[ticket.status]}\n")
+
+    return message
+
+
 async def usr_create_ticket(update: Update, context: CallbackContext):
     messages_list = get_user_messages(update, context)
     message_text = "\n".join(messages_list)
@@ -171,23 +188,6 @@ async def usr_push_ticket(update: Update, context: CallbackContext):
     logger.info(f"user pushed pushed ticket #{ticket_id}", extra={"user_id" : update.effective_chat.id})
     await ticket_manager.update_ticket(ticket_id=ticket_id, update_columns_values={"status": 3})
     await notify_admin(update=update, context=context, notification_type="ticket_overdue", ticket_id=ticket_id)
-
-
-async def format_ticket_text(ticket: Ticket):
-    status = {0: "✅Закрито",
-              1: "🟡Очікує виконання",
-              2: "🟢Виконується",
-              3: "🔴Протерміновано❗️",
-              4: "❎Скасовано користувачем"}
-
-    message = (f"🎫Тікет #{ticket.ticket_id} від користувача 🗣{ticket.shop_name}\n\n"
-               f"💬{ticket.message_text}\n\n"
-               f"🗓Дата створення заявки: {ticket.created_at}\n\n"
-               f"🏚Для відділу: {ticket.designated_dept}\n\n"
-               f"🫠Виконавець: {ticket.assigned_to}\n\n"
-               f"📊Статус: {status[ticket.status]}\n")
-
-    return message
 
 
 async def ticket_loader(update: Update, context: CallbackContext, ticket: Ticket = None, load_one: bool = False):

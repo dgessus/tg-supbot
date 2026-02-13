@@ -56,8 +56,6 @@ class TelegramBot:
         #dummy callback for buttons that do nothing. Prevents the infinite loading
         self.application.add_handler(CallbackQueryHandler(callback=dummy, pattern=r"^dummycallback$"))
 
-        self.application.add_error_handler(role_error)
-
     def run(self):
         self.application.run_polling()
 

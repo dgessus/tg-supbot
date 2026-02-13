@@ -135,3 +135,4 @@ class _Database:
 
         return self
 
+db = _Database()

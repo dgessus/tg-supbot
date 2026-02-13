@@ -46,6 +46,7 @@ async def forward_message(update: Update, context: ContextTypes.DEFAULT_TYPE, re
     elif hasattr(value, "file_id"):
         kwargs[content_type] = value.file_id
     elif content_type == "text":
+        context.user_data["user_messages"].append(value)
         kwargs["text"] = MessageConstructor.sanitize_md(value)
         kwargs["parse_mode"] = "MarkdownV2"
     else:
