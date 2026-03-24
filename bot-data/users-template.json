@@ -1,0 +1,8 @@
+{
+  "users": {
+    "380-phone number requested from telegram contact info": "username that shows up in bot"
+  },
+  "admins": {
+    "380-phone number requested from telegram contact info": "username that shows up in bot who also has access to the admin panel which opens by default"
+  }
+}

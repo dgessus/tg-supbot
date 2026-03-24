@@ -55,25 +55,26 @@ async def ticket_overdue(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await MessageConstructor(update, context).send.new_message()
 
 
-async def check_for_new_tickets(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    logger.info(f"ticket watcher has started", extra={"user_id" : update.effective_chat.id})
-    tickets = []
-    while True:
-        await asyncio.sleep(5)
-        ticket_count = len(await ticket_manager.query_open())
-        tickets[:] = [ticket_count] + tickets[:1]
-
-        try:
-            new_ticket = tickets[0] != tickets[1]
-        except IndexError:
-            new_ticket = False
-
-        if new_ticket:
-            if context.user_data['menu_position'] == 'main menu':
-                await MessageConstructor(update, context).send.refresh_message()
-
-            else:
-                try:
-                    await update.callback_query.answer("❗️У вас новий тікет")
-                except Exception:
-                    pass
+## unfinished.
+# async def check_for_new_tickets(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     logger.info(f"ticket watcher has started", extra={"user_id" : update.effective_chat.id})
+#     tickets = []
+#     while True:
+#         await asyncio.sleep(5)
+#         ticket_count = len(await ticket_manager.query_open())
+#         tickets[:] = [ticket_count] + tickets[:1]
+#
+#         try:
+#             new_ticket = tickets[0] != tickets[1]
+#         except IndexError:
+#             new_ticket = False
+#
+#         if new_ticket:
+#             if context.user_data['menu_position'] == 'main menu':
+#                 await MessageConstructor(update, context).send.refresh_message()
+#
+#             else:
+#                 try:
+#                     await update.callback_query.answer("❗️У вас новий тікет")
+#                 except Exception:
+#                     pass
