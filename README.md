@@ -118,22 +118,26 @@ screen -S supbot python main.py
 ### config.json
 ```json
 {
-  "bot_token": "YOUR_TOKEN_HERE",
-  "supported_languages": ["uk", "en"],
-  "cleanup_timeout": 300
+    "bot_username": "@botname without the @",
+    "admins": ["telegram user IDs of people who should see the admin panel"],
+    "token": "bot token",
+    "media_chat_id": "chat id to dump all the media from tickets into. bot has to be in this chat and have sufficient privileges to post there",
+    "notification_chat_id": "chat id where bot will post notifications about new tickets or the change of their statuses",
+    "supported_languages": ["list of languages that are added into instructions",
+                            "for example: /instructions/en/* means you add 'en' here",
+                            "these should also be in messages.json (see example for reference)"]
 }
 ```
 
 ### users.json
 ```json
 {
-  "+380991234567": {
-    "role": "user",
-    "shop_name": "Shop #12"
+  "users": {
+    "380-phone number requested from telegram contact info": "username that shows up in bot"
   },
-  "+380997654321": {
-    "role": "admin",
-    "shop_name": null
+  "admins": {
+    "380-phone number requested from telegram contact info": "username that shows up in bot who also has access to the admin panel which opens by default"
+    
   }
 }
 ```

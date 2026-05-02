@@ -2,7 +2,7 @@
     "bot_username": "@botname without the @",
     "admins": ["telegram user ids of people who should see the admin panel"],
     "token": "bot token",
-    "media_chat_id": "chat id to dump all the media from tickets into. bot has to be in this chat and have sufficient priviliges to post there",
+    "media_chat_id": "chat id to dump all the media from tickets into. bot has to be in this chat and have sufficient privileges to post there",
     "notification_chat_id": "chat id where bot will post notifications about new tickets or the change of their statuses",
     "supported_languages": ["list of languages that are added into instructions",
                             "for example: /instructions/en/* means you add 'en' here",
