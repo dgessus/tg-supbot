@@ -7,6 +7,7 @@ __pycache__/
 .pkl
 .idea/
 .vscode/
+.docx
 
 logs/
 upload/
